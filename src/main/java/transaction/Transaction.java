@@ -1,6 +1,7 @@
 package transaction;
 
 import account.Account;
+import account.exceptions.AccountNotFoundException;
 import account.exceptions.IllegalAccountAccessException;
 import account.exceptions.TokenNotFoundException;
 import transaction.exceptions.InvalidArgumentException;
@@ -129,15 +130,42 @@ public class Transaction {
         return null;
     }
 
-    public boolean pay() {
+    public boolean pay() throws MoneyValueException, AccountNotFoundException {
         if (!payed) {
+            if (receiptType.equals("deposit")) {
+                Account source = Account.getAccountByAccountNumber(sourceID);
+                if (source == null) {
+                    throw new AccountNotFoundException();
+                }
+                source.deposit(money);
+            }
+            if (receiptType.equals("withdraw")) {
+                Account destination = Account.getAccountByAccountNumber(destinationID);
+                if (destination == null) {
+                    throw new AccountNotFoundException();
+                }
+                destination.withdraw(money);
+            }
+            if (receiptType.equals("move")) {
+                Account source = Account.getAccountByAccountNumber(sourceID);
+                Account destination = Account.getAccountByAccountNumber(destinationID);
+                if (source == null) {
+                    throw new AccountNotFoundException();
+                }
+                if (destination == null) {
+                    throw new AccountNotFoundException();
+                }
+                source.deposit(money);
+                destination.withdraw(money);
+            }
             payed = true;
             return true;
         }
         return false;
     }
 
-    public static boolean pay(String identifier) throws InvalidArgumentException {
+    public static boolean pay(String identifier) throws InvalidArgumentException, MoneyValueException,
+            AccountNotFoundException {
         Transaction transaction = getTransactionByIdentifier(identifier);
         if (transaction == null) {
             throw new InvalidArgumentException();
@@ -155,6 +183,13 @@ public class Transaction {
                 ", \"destinationID\":" + destinationID +
                 ", \"description\":\"" + description + '\"' +
                 '}';
+    }
+
+    public static String getTransactions(String token, String type) {
+        boolean toTokenAccount = (type.equals("*") || type.equals("-"));
+        boolean fromTokenAccount = (type.equals("*") || type.equals("+"));
+        String transactions = "";
+        return transactions;
     }
 
     private static boolean isAccountNumberUnexpected(String accountNumberStr) {

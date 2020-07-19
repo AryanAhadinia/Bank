@@ -3,12 +3,14 @@ package account;
 import account.exceptions.PasswordMissMatchException;
 import account.exceptions.TokenNotFoundException;
 import account.exceptions.UsernameException;
+import transaction.exceptions.MoneyValueException;
 
 import java.util.*;
 
 public class Account {
     private static final ArrayList<Account> All_ACCOUNTS = new ArrayList<>();
     private static final HashMap<String, Account> TOKEN_TO_ACCOUNT_HASH_MAP = new HashMap<>();
+    private static final ArrayList<String> EXPIRED_TOKENS = new ArrayList<>();
 
     private final String firstName;
     private final String lastName;
@@ -82,7 +84,9 @@ public class Account {
         setCredit(credit + amount);
     }
 
-    public void withdraw(int amount) {
+    public void withdraw(int amount) throws MoneyValueException {
+        if (credit < amount)
+            throw new MoneyValueException();
         setCredit(credit - amount);
     }
 
@@ -146,9 +150,11 @@ public class Account {
             @Override
             public void run() {
                 TOKEN_TO_ACCOUNT_HASH_MAP.remove(token);
+                EXPIRED_TOKENS.add(token);
                 token = null;
             }
         };
+        tokenTimer.cancel();
         tokenTimer.schedule(expireToken, new Date(System.currentTimeMillis() + 3600000));
         return token;
     }

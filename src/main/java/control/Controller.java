@@ -1,10 +1,7 @@
 package control;
 
 import account.Account;
-import account.exceptions.IllegalAccountAccessException;
-import account.exceptions.PasswordMissMatchException;
-import account.exceptions.TokenNotFoundException;
-import account.exceptions.UsernameException;
+import account.exceptions.*;
 import transaction.Transaction;
 import transaction.exceptions.InvalidArgumentException;
 import transaction.exceptions.MoneyValueException;
@@ -62,7 +59,20 @@ public class Controller {
     }
 
     public String controlPay(String[] requestElements) {
-        return null;
+        try {
+            boolean pay = Transaction.pay(requestElements[1]);
+            if (pay) {
+                return "done successfully";
+            } else {
+                return "source account does not have enough money";
+            }
+        } catch (InvalidArgumentException e) {
+            return "invalid receipt id";
+        } catch (MoneyValueException e) {
+            return "source account does not have enough money";
+        } catch (AccountNotFoundException e) {
+            return "invalid account id";
+        }
     }
 
     public String controlGetBalance(String[] requestElements) {

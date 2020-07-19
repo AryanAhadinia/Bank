@@ -78,7 +78,7 @@ public class TransactionDataBase {
                 boolean payed = resultSet.getBoolean("payed");
                 String identifier = resultSet.getString("identifier");
 
-                new Transaction(token, receiptType, money, sourceId, destinationId, description, payed);
+                new Transaction(token, receiptType, money, sourceId, destinationId, description, payed, identifier);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
