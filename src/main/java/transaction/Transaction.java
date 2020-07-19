@@ -1,6 +1,7 @@
 package transaction;
 
 import account.Account;
+import account.exceptions.IllegalAccountAccessException;
 import account.exceptions.TokenNotFoundException;
 import transaction.exceptions.InvalidArgumentException;
 import transaction.exceptions.MoneyValueException;
@@ -18,23 +19,27 @@ public class Transaction {
     private final int destinationID;
     private final String description;
 
-    private boolean status;
+    private boolean payed;
+
+    private final String identifier;
 
     public Transaction(String token, String receiptType, int money, int sourceID, int destinationID, String description,
-                       boolean status) {
+                       boolean payed) {
         this.token = token;
         this.receiptType = receiptType;
         this.money = money;
         this.sourceID = sourceID;
         this.destinationID = destinationID;
         this.description = description;
-        this.status = status;
+        this.payed = payed;
+        this.identifier = "TR" + receiptType.substring(0, 3).toUpperCase() +
+                String.format("%015d", ALL_TRANSACTIONS.size() + 1);
         ALL_TRANSACTIONS.add(this);
     }
 
-    public static void getInstance(String token, String receiptType, String moneyStr, String sourceIDStr,
+    public static String getInstance(String token, String receiptType, String moneyStr, String sourceIDStr,
                                    String destinationIDStr, String description) throws TransactionTypeException,
-            MoneyValueException, TokenNotFoundException, InvalidArgumentException {
+            MoneyValueException, TokenNotFoundException, InvalidArgumentException, IllegalAccountAccessException {
         if (!(receiptType.equals("deposit") || receiptType.equals("withdraw") || receiptType.equals("move"))) {
             throw new TransactionTypeException();
         }
@@ -47,10 +52,10 @@ public class Transaction {
         if (Account.getAccountByToken(token) == null) {
             throw new TokenNotFoundException();
         }
-        if (!isAccountNumberExpected(sourceIDStr)) {
+        if (isAccountNumberUnexpected(sourceIDStr)) {
             throw new InvalidArgumentException("source account id is invalid");
         }
-        if (!isAccountNumberExpected(sourceIDStr)) {
+        if (isAccountNumberUnexpected(sourceIDStr)) {
             throw new InvalidArgumentException("dest account id is invalid");
         }
         int sourceId = Integer.parseInt(sourceIDStr);
@@ -70,16 +75,73 @@ public class Transaction {
         if (!description.matches("\\w*")) {
             throw new InvalidArgumentException("your input contains invalid characters");
         }
+        Account account = Account.getAccountByAccountNumber(sourceId);
+        if ((receiptType.equals("move") || receiptType.equals("withdraw"))) {
+            if (account == null) {
+                throw new InvalidArgumentException("invalid account id");
+            }
+            if (!account.getToken().equals(token)) {
+                throw new IllegalAccountAccessException();
+            }
+        }
+        return new Transaction(token, receiptType, money, sourceId, destinationId, description, false).getIdentifier();
     }
 
-    public static void getInstance(String token, String receiptType, String moneyStr, String sourceIDStr,
-                                   String destinationIDStr) throws TransactionTypeException, MoneyValueException,
-            TokenNotFoundException, InvalidArgumentException {
-        getInstance(token, receiptType, moneyStr, sourceIDStr, destinationIDStr, "");
+    public String getToken() {
+        return token;
     }
 
-    public void pay() {
-        status = true;
+    public String getReceiptType() {
+        return receiptType;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public int getSourceID() {
+        return sourceID;
+    }
+
+    public int getDestinationID() {
+        return destinationID;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isPayed() {
+        return payed;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public static Transaction getTransactionByIdentifier(String identifier) {
+        for (Transaction transaction : ALL_TRANSACTIONS) {
+            if (identifier.equals(transaction.getIdentifier())) {
+                return transaction;
+            }
+        }
+        return null;
+    }
+
+    public boolean pay() {
+        if (!payed) {
+            payed = true;
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean pay(String identifier) throws InvalidArgumentException {
+        Transaction transaction = getTransactionByIdentifier(identifier);
+        if (transaction == null) {
+            throw new InvalidArgumentException();
+        }
+        return transaction.pay();
     }
 
     @Override
@@ -94,13 +156,16 @@ public class Transaction {
                 '}';
     }
 
-    private static boolean isAccountNumberExpected(String accountNumberStr) {
+    private static boolean isAccountNumberUnexpected(String accountNumberStr) {
         int accountNumber;
         try {
             accountNumber = Integer.parseInt(accountNumberStr);
         } catch (NumberFormatException e) {
-            return false;
+            return true;
         }
-        return accountNumber >= -1;
+        if (accountNumber == -1)
+            return false;
+        else
+            return Account.getAccountByAccountNumber(accountNumber) == null;
     }
 }

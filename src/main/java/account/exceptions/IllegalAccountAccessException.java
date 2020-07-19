@@ -1,4 +1,4 @@
 package account.exceptions;
 
-public class IllegalAccountAccessException {
+public class IllegalAccountAccessException extends Exception {
 }
