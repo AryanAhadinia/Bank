@@ -1,5 +1,5 @@
-# Bank
-Bank for Advanced Programming Project Spring 2020
+# [Bank](https://github.com/AryanAhadinia/Bank/tree/master)
+Bank for [Advanced Programming Project Spring 2020](https://github.com/AdvProg2020/Project_team-34)
 
 ## People
 | Name | Student number |
