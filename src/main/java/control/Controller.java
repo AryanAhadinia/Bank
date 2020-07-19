@@ -1,8 +1,8 @@
 package control;
 
 import account.Account;
-import account.PasswordMissMatchException;
-import account.UsernameException;
+import account.exceptions.PasswordMissMatchException;
+import account.exceptions.UsernameException;
 
 public class Controller {
 

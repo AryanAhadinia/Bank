@@ -1,4 +1,4 @@
-package account;
+package account.exceptions;
 
 public class UsernameException extends Exception {
 }

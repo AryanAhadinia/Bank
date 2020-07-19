@@ -1,5 +1,8 @@
 package account;
 
+import account.exceptions.PasswordMissMatchException;
+import account.exceptions.UsernameException;
+
 import java.util.*;
 
 public class Account {
