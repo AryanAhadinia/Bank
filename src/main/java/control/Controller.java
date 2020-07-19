@@ -1,13 +1,28 @@
 package control;
 
+import account.Account;
+import account.PasswordMissMatchException;
+import account.UsernameException;
+
 public class Controller {
 
     public String controlCreateAccount(String[] requestElements) {
-        return null;
+        try {
+            return  Account.getInstance(requestElements[1], requestElements[2], requestElements[3], requestElements[4],
+                    requestElements[5]);
+        } catch (UsernameException e) {
+            return "username is not available";
+        } catch (PasswordMissMatchException e) {
+            return "passwords do not match";
+        }
     }
 
     public String controlGetToken(String[] requestElements) {
-        return null;
+        try {
+            return Account.assignToken(requestElements[1], requestElements[2]);
+        } catch (UsernameException | PasswordMissMatchException e) {
+            return "invalid username or password";
+        }
     }
 
     public String controlCreateReceipt(String[] requestElements) {
