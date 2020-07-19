@@ -24,7 +24,7 @@ public class Transaction {
     private final String identifier;
 
     public Transaction(String token, String receiptType, int money, int sourceID, int destinationID, String description,
-                       boolean payed) {
+                       boolean payed, String identifier) {
         this.token = token;
         this.receiptType = receiptType;
         this.money = money;
@@ -32,8 +32,7 @@ public class Transaction {
         this.destinationID = destinationID;
         this.description = description;
         this.payed = payed;
-        this.identifier = "TR" + receiptType.substring(0, 3).toUpperCase() +
-                String.format("%015d", ALL_TRANSACTIONS.size() + 1);
+        this.identifier = identifier;
         ALL_TRANSACTIONS.add(this);
     }
 
@@ -84,7 +83,9 @@ public class Transaction {
                 throw new IllegalAccountAccessException();
             }
         }
-        return new Transaction(token, receiptType, money, sourceId, destinationId, description, false).getIdentifier();
+        return new Transaction(token, receiptType, money, sourceId, destinationId, description, false,
+                "TR" + receiptType.substring(0, 3).toUpperCase() + String.format("%015d",
+                        ALL_TRANSACTIONS.size() + 1)).getIdentifier();
     }
 
     public String getToken() {
