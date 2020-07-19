@@ -17,7 +17,7 @@ public class Account {
     private String token;
     private final Timer tokenTimer;
 
-    public Account(String firstName, String lastName, String username, String password, int accountNumber, int credit) {
+    public Account(String firstName, String lastName, String username, String password, long accountNumber, int credit) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
