@@ -1,6 +1,7 @@
 package account;
 
 import account.exceptions.PasswordMissMatchException;
+import account.exceptions.TokenNotFoundException;
 import account.exceptions.UsernameException;
 
 import java.util.*;
@@ -160,6 +161,14 @@ public class Account {
         if (account.checkPassword(password))
             throw new PasswordMissMatchException();
         return account.assignToken();
+    }
+
+    public static int getCredit(String token) throws TokenNotFoundException {
+        Account account = getAccountByToken(token);
+        if (account == null) {
+            throw new TokenNotFoundException();
+        }
+        return account.getCredit();
     }
 
     @Override

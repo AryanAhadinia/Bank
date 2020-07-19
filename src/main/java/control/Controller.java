@@ -66,6 +66,10 @@ public class Controller {
     }
 
     public String controlGetBalance(String[] requestElements) {
-        return null;
+        try {
+            return String.valueOf(Account.getCredit(requestElements[1]));
+        } catch (TokenNotFoundException e) {
+            return "token is invalid";
+        }
     }
 }
