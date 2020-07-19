@@ -126,7 +126,7 @@ public class Account {
 
     public static int generateAccountNumber() {
         Random rand = new Random();
-        final int UPPER_BOUND = 900000;
+        final int UPPER_BOUND = 899999;
         final int LOWER_BOUND = 100000;
         int accountNumber = rand.nextInt(UPPER_BOUND);
         return accountNumber + LOWER_BOUND;
