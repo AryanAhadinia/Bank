@@ -114,11 +114,22 @@ public class Account {
     }
 
     public static String generateRandomToken() {
-        return null;
+        final String LETTERS_SET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random rand = new Random();
+        int upperBound = LETTERS_SET.length()-1;
+        StringBuilder code = new StringBuilder();
+        for(int i = 0;i < 10;i++){
+            code.append(LETTERS_SET.charAt(rand.nextInt(upperBound)));
+        }
+        return code.toString();
     }
 
     public static int generateAccountNumber() {
-        return 0;
+        Random rand = new Random();
+        final int UPPER_BOUND = 900000;
+        final int LOWER_BOUND = 100000;
+        int accountNumber = rand.nextInt(UPPER_BOUND);
+        return accountNumber + LOWER_BOUND;
     }
 
     private String assignToken() {
