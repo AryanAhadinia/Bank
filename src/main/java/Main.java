@@ -1,8 +1,8 @@
-import database.AccountDataBase;
+import database.DataBase;
 
 public class Main {
 
     public static void main(String[] args) {
-        AccountDataBase.createNewTable();
+        DataBase.createNewTablesToStart();
     }
 }

@@ -1,5 +1,8 @@
 package database;
 
+import account.Account;
+import transaction.Transaction;
+
 import java.sql.*;
 import java.util.HashMap;
 
@@ -81,5 +84,10 @@ public class DataBase {
             System.out.println(e.getMessage());
         }
         return true;
+    }
+
+    public static void createNewTablesToStart(){
+        AccountDataBase.createNewTable();
+        TransactionDataBase.createNewTable();
     }
 }
