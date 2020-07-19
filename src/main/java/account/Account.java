@@ -11,20 +11,21 @@ public class Account {
     private final String username;
     private final String password;
 
-    private long accountNumber;
+    private final long accountNumber;
     private int credit;
 
     private String token;
-    private Timer tokenTimer;
+    private final Timer tokenTimer;
 
     public Account(String firstName, String lastName, String username, String password, int accountNumber, int credit) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+        this.accountNumber = accountNumber;
+        this.credit = credit;
         this.token = null;
-        this.tokenTimer = null;
-        tokenTimer = new Timer();
+        this.tokenTimer = new Timer();
         All_ACCOUNTS.add(this);
     }
 
@@ -34,8 +35,11 @@ public class Account {
             throw new PasswordMissMatchException();
         if (getAccountByUsername(username) != null)
             throw new UsernameException();
-        return String.valueOf((new Account(firstName, lastName, username, password, generateAccountNumber(), 0)).
-                getAccountNumber());
+        int accountNumber;
+        do {
+            accountNumber = generateAccountNumber();
+        } while (getAccountByAccountNumber(accountNumber) != null);
+        return String.valueOf((new Account(firstName, lastName, username, password, accountNumber, 0)).getAccountNumber());
     }
 
     public String getFirstName() {
@@ -64,6 +68,18 @@ public class Account {
 
     public int getCredit() {
         return credit;
+    }
+
+    public void setCredit(int credit) {
+        this.credit = credit;
+    }
+
+    public void deposit(int amount) {
+        setCredit(credit + amount);
+    }
+
+    public void withdraw(int amount) {
+        setCredit(credit - amount);
     }
 
     public static Account getAccountByUsername(String username) {
