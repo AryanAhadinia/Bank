@@ -1,8 +1,16 @@
 package control;
 
 import account.Account;
-import account.PasswordMissMatchException;
-import account.UsernameException;
+import account.exceptions.IllegalAccountAccessException;
+import account.exceptions.PasswordMissMatchException;
+import account.exceptions.TokenNotFoundException;
+import account.exceptions.UsernameException;
+import transaction.Transaction;
+import transaction.exceptions.InvalidArgumentException;
+import transaction.exceptions.MoneyValueException;
+import transaction.exceptions.TransactionTypeException;
+
+import java.util.Arrays;
 
 public class Controller {
 
@@ -26,7 +34,27 @@ public class Controller {
     }
 
     public String controlCreateReceipt(String[] requestElements) {
-        return null;
+        if (requestElements.length != 6 && requestElements.length != 7) {
+            return "invalid parameters passed";
+        }
+        if (requestElements.length == 6) {
+            requestElements = Arrays.copyOf(requestElements, 7);
+            requestElements[6] = "";
+        }
+        try {
+            return Transaction.getInstance(requestElements[1], requestElements[2], requestElements[3],
+                    requestElements[4], requestElements[5], requestElements[6]);
+        } catch (TransactionTypeException e) {
+            return "invalid receipt type";
+        } catch (MoneyValueException e) {
+            return "invalid money";
+        } catch (TokenNotFoundException e) {
+            return "token expired";
+        } catch (InvalidArgumentException e) {
+            return e.getMessage();
+        } catch (IllegalAccountAccessException e) {
+            return "token is invalid";
+        }
     }
 
     public String controlGetTransactions(String[] requestElements) {
