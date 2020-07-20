@@ -39,19 +39,20 @@ public class ClientThread extends Thread {
                 String[] requestElements = request.split("\\s");
                 String command = requestElements[0];
                 StringBuilder response = new StringBuilder();
-                if ("create_account".equals(command)) {
+                if ("create_account".equals(command) && requestElements.length == 6) {
                     response.append(controller.controlCreateAccount(requestElements));
-                } else if ("get_token".equals(command)) {
+                } else if ("get_token".equals(command) && requestElements.length == 3) {
                     response.append(controller.controlGetToken(requestElements));
-                } else if ("create_receipt".equals(command)) {
+                } else if ("create_receipt".equals(command) && (requestElements.length == 6 || requestElements.length == 7)) {
                     response.append(controller.controlCreateReceipt(requestElements));
-                } else if ("get_transactions".equals(command)) {
+                } else if ("get_transactions".equals(command) && requestElements.length == 3) {
                     response.append(controller.controlGetTransactions(requestElements));
-                } else if ("pay".equals(command)) {
+                } else if ("pay".equals(command) && requestElements.length == 2) {
                     response.append(controller.controlPay(requestElements));
-                } else if ("get_balance".equals(command)) {
+                } else if ("get_balance".equals(command) && requestElements.length == 2) {
                     response.append(controller.controlGetBalance(requestElements));
-                } else if ("exit".equals(command)) {
+                } else if ("exit".equals(command) && requestElements.length == 1) {
+                    disconnect();
                     break;
                 } else {
                     response.append("invalid input");

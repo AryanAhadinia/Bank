@@ -164,6 +164,7 @@ public class Account {
             }
         };
         tokenTimer = new Timer();
+        //check
         tokenTimer.schedule(expireToken, new Date(System.currentTimeMillis() + 3600000));
         return token;
     }

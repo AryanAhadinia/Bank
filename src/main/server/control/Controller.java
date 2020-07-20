@@ -16,9 +16,6 @@ import java.util.Arrays;
 public class Controller {
 
     public String controlCreateAccount(String[] requestElements) {
-        if (requestElements.length != 6) {
-            return "invalid arguments";
-        }
         try {
             return Account.getInstance(requestElements[1], requestElements[2], requestElements[3], requestElements[4],
                     requestElements[5]);
@@ -30,8 +27,6 @@ public class Controller {
     }
 
     public String controlGetToken(String[] requestElements) {
-        if (requestElements.length != 3)
-            return "invalid input";
         try {
             return Account.assignToken(requestElements[1], requestElements[2]);
         } catch (UsernameException | PasswordMissMatchException e) {
@@ -81,7 +76,7 @@ public class Controller {
             if (pay) {
                 return "done successfully";
             } else {
-                return "source account does not have enough money";
+                return "receipt is paid before";
             }
         } catch (InvalidArgumentException e) {
             return "invalid receipt id";
