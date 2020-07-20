@@ -5,9 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Server implements Runnable {
-    private final Scanner scanner = new Scanner(System.in);
-
+public class Server extends Thread {
     private ServerSocket serverSocket;
 
     public Server(int port) {
@@ -22,11 +20,13 @@ public class Server implements Runnable {
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
+        System.out.println("Bank is up");
         do {
             try {
                 Socket socket = serverSocket.accept();
                 try {
                     ClientThread.getInstance(socket).start();
+                    System.out.println("hello");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
