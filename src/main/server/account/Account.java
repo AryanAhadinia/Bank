@@ -9,6 +9,10 @@ import transaction.exceptions.MoneyValueException;
 
 import java.util.*;
 
+/**
+ * @author Aryan Ahadinia
+ * @since 1.0.0
+ */
 public class Account {
     private static final ArrayList<Account> All_ACCOUNTS = new ArrayList<>();
     private static final HashMap<String, Account> TOKEN_TO_ACCOUNT_HASH_MAP = new HashMap<>();

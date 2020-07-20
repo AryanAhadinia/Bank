@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * @author Aryan Ahadinia
+ * @since 1.0.0
+ */
 public class Server extends Thread {
     private ServerSocket serverSocket;
 

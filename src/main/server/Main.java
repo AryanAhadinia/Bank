@@ -3,6 +3,10 @@ import server.Server;
 
 import java.util.Scanner;
 
+/**
+ * @author Aryan Ahadinia
+ * @since 1.0.0
+ */
 public class Main {
 
     public static void main(String[] args) {

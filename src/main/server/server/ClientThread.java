@@ -8,6 +8,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * @author Aryan Ahadinia
+ * @since 1.0.0
+ */
 public class ClientThread extends Thread {
     private final Socket socket;
     private final DataInputStream inputStream;

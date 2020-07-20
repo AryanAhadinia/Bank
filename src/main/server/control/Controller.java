@@ -9,6 +9,10 @@ import transaction.exceptions.TransactionTypeException;
 
 import java.util.Arrays;
 
+/**
+ * @author Aryan Ahadinia
+ * @since 1.0.0
+ */
 public class Controller {
 
     public String controlCreateAccount(String[] requestElements) {
@@ -16,7 +20,7 @@ public class Controller {
             return "invalid arguments";
         }
         try {
-            return  Account.getInstance(requestElements[1], requestElements[2], requestElements[3], requestElements[4],
+            return Account.getInstance(requestElements[1], requestElements[2], requestElements[3], requestElements[4],
                     requestElements[5]);
         } catch (UsernameException e) {
             return "username is not available";
