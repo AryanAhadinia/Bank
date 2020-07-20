@@ -1,4 +1,4 @@
 package transaction.exceptions;
 
-public class MoneyValueException extends Throwable {
+public class MoneyValueException extends Exception {
 }
