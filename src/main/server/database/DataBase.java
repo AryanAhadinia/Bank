@@ -1,8 +1,5 @@
 package database;
 
-import account.Account;
-import transaction.Transaction;
-
 import java.sql.*;
 import java.util.HashMap;
 

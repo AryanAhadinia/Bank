@@ -131,7 +131,7 @@ public class Account {
         for (int i = 0; i < 10; i++) {
             code.append(LETTERS_SET.charAt(rand.nextInt(upperBound)));
         }
-        return code.toString();
+        return "TOKEN_" + code.toString();
     }
 
     public static int generateAccountNumber() {
