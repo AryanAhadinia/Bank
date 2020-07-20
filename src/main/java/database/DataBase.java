@@ -90,4 +90,9 @@ public class DataBase {
         AccountDataBase.createNewTable();
         TransactionDataBase.createNewTable();
     }
+
+    public static void importAllData(){
+        AccountDataBase.importAllAccounts();
+        TransactionDataBase.importAllTransactions();
+    }
 }
