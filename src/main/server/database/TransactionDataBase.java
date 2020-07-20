@@ -30,7 +30,7 @@ public class TransactionDataBase {
 
 
     public static void add(Transaction transaction) {
-        if (DataBase.doesIdAlreadyExist("Transaction", "identifier", transaction.getIdentifier())) {
+        if (DataBase.doesIdAlreadyExist("Transactions", "identifier", transaction.getIdentifier())) {
             return;
         }
         String sql = "INSERT into Transactions (token, receiptType, money, sourceId, destinationId, description, payed, identifier) " +
