@@ -29,7 +29,6 @@ public class Server extends Thread {
                 Socket socket = serverSocket.accept();
                 try {
                     ClientThread.getInstance(socket).start();
-                    System.out.println("hello");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -1,6 +1,7 @@
 package server;
 
 import control.Controller;
+import main.Main;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -33,6 +34,8 @@ public class ClientThread extends Thread {
 
     @Override
     public void run() {
+        if (Main.debugPrint)
+            System.out.println(Thread.currentThread().getName() + "\t" + "Connected");
         while (true) {
             try {
                 String request = inputStream.readUTF();
@@ -57,7 +60,9 @@ public class ClientThread extends Thread {
                 } else {
                     response.append("invalid input");
                 }
-                System.out.println(Thread.currentThread().getName() + "\t" + "Request: " + request + "\n\t\t\t" + "Response: " + response);
+                if (Main.debugPrint)
+                    System.out.println(Thread.currentThread().getName() + "\t" + "Request:\t" + request + "\n\t\t\t" +
+                            "Response:\t" + response);
                 try {
                     outputStream.writeUTF(response.toString());
                 } catch (IOException e) {
@@ -78,6 +83,8 @@ public class ClientThread extends Thread {
                 System.err.println("Error, InputStream");
             }
         }
+        if (Main.debugPrint)
+            System.out.println(Thread.currentThread().getName() + "\t" + "Disconnected");
     }
 
     private boolean disconnect() {
