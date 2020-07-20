@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public class DataBase {
 
-    private  final static String url = "jdbc:sqlite:.\\src\\t";
+    private  final static String url = "jdbc:sqlite:.\\src\\DataBase";
     private final static Connection connection = connect();
 
     private static Connection connect() {
