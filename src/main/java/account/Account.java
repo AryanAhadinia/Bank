@@ -1,8 +1,10 @@
 package account;
 
 import account.exceptions.PasswordMissMatchException;
+import account.exceptions.TokenExpiryException;
 import account.exceptions.TokenNotFoundException;
 import account.exceptions.UsernameException;
+import database.AccountDataBase;
 import transaction.exceptions.MoneyValueException;
 
 import java.util.*;
@@ -32,7 +34,7 @@ public class Account {
         this.credit = credit;
         this.token = null;
         this.tokenTimer = new Timer();
-        All_ACCOUNTS.add(this);
+        Account.All_ACCOUNTS.add(this);
     }
 
     public static String getInstance(String firstName, String lastName, String username, String password,
@@ -45,7 +47,9 @@ public class Account {
         do {
             accountNumber = generateAccountNumber();
         } while (getAccountByAccountNumber(accountNumber) != null);
-        return String.valueOf((new Account(firstName, lastName, username, password, accountNumber, 0)).getAccountNumber());
+        Account account = new Account(firstName, lastName, username, password, accountNumber, 0);
+        AccountDataBase.add(account);
+        return String.valueOf(accountNumber);
     }
 
     public String getFirstName() {
@@ -78,6 +82,7 @@ public class Account {
 
     public void setCredit(int credit) {
         this.credit = credit;
+        AccountDataBase.update(this);
     }
 
     public void deposit(int amount) {
@@ -99,7 +104,9 @@ public class Account {
         return null;
     }
 
-    public static Account getAccountByToken(String token) {
+    public static Account getAccountByToken(String token) throws TokenExpiryException {
+        if (EXPIRED_TOKENS.contains(token))
+            throw new TokenExpiryException();
         for (Account account : All_ACCOUNTS) {
             if (token.equals(account.getToken())) {
                 return account;
@@ -144,7 +151,7 @@ public class Account {
         TOKEN_TO_ACCOUNT_HASH_MAP.remove(token);
         do {
             token = generateRandomToken();
-        } while (TOKEN_TO_ACCOUNT_HASH_MAP.containsKey(token));
+        } while (TOKEN_TO_ACCOUNT_HASH_MAP.containsKey(token) || EXPIRED_TOKENS.contains(token));
         TOKEN_TO_ACCOUNT_HASH_MAP.put(token, this);
         TimerTask expireToken = new TimerTask() {
             @Override
@@ -169,7 +176,7 @@ public class Account {
         return account.assignToken();
     }
 
-    public static int getCredit(String token) throws TokenNotFoundException {
+    public static int getCredit(String token) throws TokenNotFoundException, TokenExpiryException {
         Account account = getAccountByToken(token);
         if (account == null) {
             throw new TokenNotFoundException();
@@ -189,5 +196,17 @@ public class Account {
     @Override
     public int hashCode() {
         return Objects.hash(username, accountNumber);
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "\"firstName:\"" + firstName + '\'' +
+                ", \"lastName:\"\"" + lastName + '\'' +
+                ", \"username\"" + username + '\'' +
+                ", \"password:\"" + password + '\'' +
+                ", \"accountNumber:\"" + accountNumber +
+                ", \"credit\"=" + credit +
+                '}';
     }
 }
