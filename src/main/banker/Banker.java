@@ -2,8 +2,11 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * @author Aryan Ahadinia
+ * @since 1.0.0
+ */
 public class Banker {
-
     public final static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
