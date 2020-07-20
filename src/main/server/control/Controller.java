@@ -27,7 +27,7 @@ public class Controller {
 
     public String controlGetToken(String[] requestElements) {
         if (requestElements.length != 3)
-            return "invalid arguments";
+            return "invalid input";
         try {
             return Account.assignToken(requestElements[1], requestElements[2]);
         } catch (UsernameException | PasswordMissMatchException e) {
