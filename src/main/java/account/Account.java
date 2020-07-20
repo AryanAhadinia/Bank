@@ -38,8 +38,8 @@ public class Account {
     }
 
     public static String getInstance(String firstName, String lastName, String username, String password,
-                                      String passwordRepeat) throws UsernameException, PasswordMissMatchException {
-        if (password.equals(passwordRepeat))
+                                     String passwordRepeat) throws UsernameException, PasswordMissMatchException {
+        if (!password.equals(passwordRepeat))
             throw new PasswordMissMatchException();
         if (getAccountByUsername(username) != null)
             throw new UsernameException();
@@ -107,12 +107,7 @@ public class Account {
     public static Account getAccountByToken(String token) throws TokenExpiryException {
         if (EXPIRED_TOKENS.contains(token))
             throw new TokenExpiryException();
-        for (Account account : All_ACCOUNTS) {
-            if (token.equals(account.getToken())) {
-                return account;
-            }
-        }
-        return null;
+        return TOKEN_TO_ACCOUNT_HASH_MAP.get(token);
     }
 
     public static Account getAccountByAccountNumber(int accountNumber) {
@@ -131,9 +126,9 @@ public class Account {
     public static String generateRandomToken() {
         final String LETTERS_SET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random rand = new Random();
-        int upperBound = LETTERS_SET.length()-1;
+        int upperBound = LETTERS_SET.length() - 1;
         StringBuilder code = new StringBuilder();
-        for(int i = 0;i < 10;i++){
+        for (int i = 0; i < 10; i++) {
             code.append(LETTERS_SET.charAt(rand.nextInt(upperBound)));
         }
         return code.toString();
@@ -148,10 +143,13 @@ public class Account {
     }
 
     private String assignToken() {
-        TOKEN_TO_ACCOUNT_HASH_MAP.remove(token);
+        String previousToken = token;
         do {
             token = generateRandomToken();
         } while (TOKEN_TO_ACCOUNT_HASH_MAP.containsKey(token) || EXPIRED_TOKENS.contains(token));
+        TOKEN_TO_ACCOUNT_HASH_MAP.remove(previousToken);
+        EXPIRED_TOKENS.add(previousToken);
+        tokenTimer.cancel();
         TOKEN_TO_ACCOUNT_HASH_MAP.put(token, this);
         TimerTask expireToken = new TimerTask() {
             @Override
@@ -161,7 +159,6 @@ public class Account {
                 token = null;
             }
         };
-        tokenTimer.cancel();
         tokenTimer.schedule(expireToken, new Date(System.currentTimeMillis() + 3600000));
         return token;
     }

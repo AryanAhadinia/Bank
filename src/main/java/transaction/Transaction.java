@@ -3,7 +3,9 @@ package transaction;
 import account.Account;
 import account.exceptions.AccountNotFoundException;
 import account.exceptions.IllegalAccountAccessException;
+import account.exceptions.TokenExpiryException;
 import account.exceptions.TokenNotFoundException;
+import database.TransactionDataBase;
 import transaction.exceptions.InvalidArgumentException;
 import transaction.exceptions.MoneyValueException;
 import transaction.exceptions.TransactionTypeException;
@@ -24,6 +26,9 @@ public class Transaction {
 
     private final String identifier;
 
+    private final Account source;
+    private final Account destination;
+
     public Transaction(String token, String receiptType, int money, int sourceID, int destinationID, String description,
                        boolean payed, String identifier) {
         this.token = token;
@@ -34,18 +39,23 @@ public class Transaction {
         this.description = description;
         this.payed = payed;
         this.identifier = identifier;
+        this.source = Account.getAccountByAccountNumber(sourceID);
+        this.destination = Account.getAccountByAccountNumber(destinationID);
         ALL_TRANSACTIONS.add(this);
     }
 
     public static String getInstance(String token, String receiptType, String moneyStr, String sourceIDStr,
                                    String destinationIDStr, String description) throws TransactionTypeException,
-            MoneyValueException, TokenNotFoundException, InvalidArgumentException, IllegalAccountAccessException {
+            MoneyValueException, TokenNotFoundException, InvalidArgumentException, IllegalAccountAccessException,
+            TokenExpiryException {
         if (!(receiptType.equals("deposit") || receiptType.equals("withdraw") || receiptType.equals("move"))) {
             throw new TransactionTypeException();
         }
         int money;
         try {
             money = Integer.parseInt(moneyStr);
+            if (money <= 0)
+                throw new MoneyValueException();
         } catch (NumberFormatException e) {
             throw new MoneyValueException();
         }
@@ -84,9 +94,11 @@ public class Transaction {
                 throw new IllegalAccountAccessException();
             }
         }
-        return new Transaction(token, receiptType, money, sourceId, destinationId, description, false,
-                "TR" + receiptType.substring(0, 3).toUpperCase() + String.format("%015d",
-                        ALL_TRANSACTIONS.size() + 1)).getIdentifier();
+        Transaction transaction = new Transaction(token, receiptType, money, sourceId, destinationId, description,
+                false, "TR" + receiptType.substring(0, 3).toUpperCase() + String.format("%015d",
+                        ALL_TRANSACTIONS.size() + 1));
+        TransactionDataBase.add(transaction);
+        return transaction.getIdentifier();
     }
 
     public String getToken() {
@@ -119,6 +131,14 @@ public class Transaction {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public Account getSource() {
+        return source;
+    }
+
+    public Account getDestination() {
+        return destination;
     }
 
     public static Transaction getTransactionByIdentifier(String identifier) {
@@ -159,6 +179,7 @@ public class Transaction {
                 destination.withdraw(money);
             }
             payed = true;
+            TransactionDataBase.update(this);
             return true;
         }
         return false;
@@ -173,6 +194,29 @@ public class Transaction {
         return transaction.pay();
     }
 
+    public static String getTransactions(String token, String type) throws TokenExpiryException, TokenNotFoundException,
+            InvalidArgumentException {
+        Account account = Account.getAccountByToken(token);
+        if (account == null)
+            throw new TokenNotFoundException();
+        if (type.matches("TR(DEP|WIT|MOV)\\d{15}")) {
+            Transaction transaction = Transaction.getTransactionByIdentifier(type);
+            if (transaction == null)
+                throw new InvalidArgumentException();
+            return transaction.toString();
+        }
+        boolean toTokenAccount = (type.equals("*") || type.equals("+"));
+        boolean fromTokenAccount = (type.equals("*") || type.equals("-"));
+        ArrayList<String> transactions = new ArrayList<>();
+        for (Transaction transaction : ALL_TRANSACTIONS) {
+            if (transaction.getSource().equals(account) && fromTokenAccount ||
+                    transaction.getDestination().equals(account) && toTokenAccount) {
+                transactions.add(transaction.toString());
+            }
+        }
+        return String.join("*", transactions);
+    }
+
     @Override
     public String toString() {
         return "{" +
@@ -183,13 +227,6 @@ public class Transaction {
                 ", \"destinationID\":" + destinationID +
                 ", \"description\":\"" + description + '\"' +
                 '}';
-    }
-
-    public static String getTransactions(String token, String type) {
-        boolean toTokenAccount = (type.equals("*") || type.equals("-"));
-        boolean fromTokenAccount = (type.equals("*") || type.equals("+"));
-        String transactions = "";
-        return transactions;
     }
 
     private static boolean isAccountNumberUnexpected(String accountNumberStr) {

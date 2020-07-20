@@ -48,8 +48,9 @@ public class ClientThread extends Thread {
                 } else if ("get_balance".equals(command)) {
                     response.append(controller.controlGetBalance(requestElements));
                 } else if ("exit".equals(command)) {
+                    break;
                 } else {
-
+                    response.append("invalid input");
                 }
                 try {
                     outputStream.writeUTF(response.toString());

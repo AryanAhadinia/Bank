@@ -12,6 +12,9 @@ import java.util.Arrays;
 public class Controller {
 
     public String controlCreateAccount(String[] requestElements) {
+        if (requestElements.length != 6) {
+            return "invalid arguments";
+        }
         try {
             return  Account.getInstance(requestElements[1], requestElements[2], requestElements[3], requestElements[4],
                     requestElements[5]);
@@ -23,6 +26,8 @@ public class Controller {
     }
 
     public String controlGetToken(String[] requestElements) {
+        if (requestElements.length != 3)
+            return "invalid arguments";
         try {
             return Account.assignToken(requestElements[1], requestElements[2]);
         } catch (UsernameException | PasswordMissMatchException e) {
@@ -41,21 +46,29 @@ public class Controller {
         try {
             return Transaction.getInstance(requestElements[1], requestElements[2], requestElements[3],
                     requestElements[4], requestElements[5], requestElements[6]);
-        } catch (TransactionTypeException e) {
-            return "invalid receipt type";
         } catch (MoneyValueException e) {
             return "invalid money";
-        } catch (TokenNotFoundException e) {
-            return "token expired";
+        } catch (TransactionTypeException e) {
+            return "invalid receipt type";
         } catch (InvalidArgumentException e) {
             return e.getMessage();
-        } catch (IllegalAccountAccessException e) {
+        } catch (IllegalAccountAccessException | TokenNotFoundException e) {
             return "token is invalid";
+        } catch (TokenExpiryException e) {
+            return "token expired";
         }
     }
 
     public String controlGetTransactions(String[] requestElements) {
-        return null;
+        try {
+            return Transaction.getTransactions(requestElements[1], requestElements[2]);
+        } catch (TokenExpiryException e) {
+            return "token expired";
+        } catch (TokenNotFoundException e) {
+            return "token is invalid";
+        } catch (InvalidArgumentException e) {
+            return "invalid receipt id";
+        }
     }
 
     public String controlPay(String[] requestElements) {
@@ -80,6 +93,8 @@ public class Controller {
             return String.valueOf(Account.getCredit(requestElements[1]));
         } catch (TokenNotFoundException e) {
             return "token is invalid";
+        } catch (TokenExpiryException e) {
+            return "token expired";
         }
     }
 }
