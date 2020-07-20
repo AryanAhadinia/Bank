@@ -23,7 +23,7 @@ public class Account {
     private int credit;
 
     private String token;
-    private final Timer tokenTimer;
+    private Timer tokenTimer;
 
     public Account(String firstName, String lastName, String username, String password, long accountNumber, int credit) {
         this.firstName = firstName;
@@ -159,6 +159,7 @@ public class Account {
                 token = null;
             }
         };
+        tokenTimer = new Timer();
         tokenTimer.schedule(expireToken, new Date(System.currentTimeMillis() + 3600000));
         return token;
     }
@@ -168,7 +169,7 @@ public class Account {
         Account account = getAccountByUsername(username);
         if (account == null)
             throw new UsernameException();
-        if (account.checkPassword(password))
+        if (!account.checkPassword(password))
             throw new PasswordMissMatchException();
         return account.assignToken();
     }

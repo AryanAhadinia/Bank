@@ -12,7 +12,7 @@ import transaction.exceptions.TransactionTypeException;
 
 import java.util.ArrayList;
 
-public class Transaction {
+public class  Transaction {
     private static final ArrayList<Transaction> ALL_TRANSACTIONS = new ArrayList<>();
 
     private final String token;
@@ -153,14 +153,14 @@ public class Transaction {
     public boolean pay() throws MoneyValueException, AccountNotFoundException {
         if (!payed) {
             if (receiptType.equals("deposit")) {
-                Account source = Account.getAccountByAccountNumber(sourceID);
+                Account destination = Account.getAccountByAccountNumber(destinationID);
                 if (source == null) {
                     throw new AccountNotFoundException();
                 }
                 source.deposit(money);
             }
             if (receiptType.equals("withdraw")) {
-                Account destination = Account.getAccountByAccountNumber(destinationID);
+                Account source = Account.getAccountByAccountNumber(sourceID);
                 if (destination == null) {
                     throw new AccountNotFoundException();
                 }
