@@ -98,7 +98,7 @@ public class  Transaction {
                 false, "TR" + receiptType.substring(0, 3).toUpperCase() + String.format("%015d",
                         ALL_TRANSACTIONS.size() + 1));
         TransactionDataBase.add(transaction);
-        return transaction.getIdentifier();
+         return transaction.getIdentifier();
     }
 
     public String getToken() {
@@ -153,18 +153,16 @@ public class  Transaction {
     public boolean pay() throws MoneyValueException, AccountNotFoundException {
         if (!payed) {
             if (receiptType.equals("deposit")) {
-                Account destination = Account.getAccountByAccountNumber(destinationID);
-                if (source == null) {
-                    throw new AccountNotFoundException();
-                }
-                source.deposit(money);
-            }
-            if (receiptType.equals("withdraw")) {
-                Account source = Account.getAccountByAccountNumber(sourceID);
                 if (destination == null) {
                     throw new AccountNotFoundException();
                 }
-                destination.withdraw(money);
+                destination.deposit(money);
+            }
+            if (receiptType.equals("withdraw")) {
+                if (source == null) {
+                    throw new AccountNotFoundException();
+                }
+                source.withdraw(money);
             }
             if (receiptType.equals("move")) {
                 Account source = Account.getAccountByAccountNumber(sourceID);
@@ -175,8 +173,8 @@ public class  Transaction {
                 if (destination == null) {
                     throw new AccountNotFoundException();
                 }
-                source.deposit(money);
-                destination.withdraw(money);
+                source.withdraw(money);
+                destination.deposit(money);
             }
             payed = true;
             TransactionDataBase.update(this);
