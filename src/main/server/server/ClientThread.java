@@ -32,6 +32,7 @@ public class ClientThread extends Thread {
         while (true) {
             try {
                 String request = inputStream.readUTF();
+                System.out.println("Request: " + request + " " + Thread.currentThread().getName());
                 String[] requestElements = request.split("\\s");
                 String command = requestElements[0];
                 StringBuilder response = new StringBuilder();
@@ -54,6 +55,7 @@ public class ClientThread extends Thread {
                 }
                 try {
                     outputStream.writeUTF(response.toString());
+                    System.out.println("Response: " + response + " " + Thread.currentThread().getName());
                 } catch (IOException e) {
                     System.err.println("Error, OutputStream");
                     break;
