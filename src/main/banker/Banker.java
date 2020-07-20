@@ -13,13 +13,15 @@ public class Banker {
         Connection connection = establishConnection();
         System.out.println("Connection established");
         String command;
-        while (!((command = scanner.nextLine()).equals("end session"))) {
+        while (!((command = scanner.nextLine()).equals("exit"))) {
             String response = connection.getResponse(command);
             if (response.startsWith("Error,"))
                 System.err.println(response);
             else
                 System.out.println(response);
         }
+        connection.getResponse("exit");
+        connection.disconnect();
     }
 
     public static Connection establishConnection() {
