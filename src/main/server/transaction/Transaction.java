@@ -59,38 +59,44 @@ public class  Transaction {
         } catch (NumberFormatException e) {
             throw new MoneyValueException();
         }
+        if (!description.matches("\\w*")) {
+            throw new InvalidArgumentException("your input contains invalid characters");
+        }
         if (Account.getAccountByToken(token) == null) {
             throw new TokenNotFoundException();
         }
         if (isAccountNumberUnexpected(sourceIDStr)) {
             throw new InvalidArgumentException("source account id is invalid");
         }
-        if (isAccountNumberUnexpected(sourceIDStr)) {
+        if (isAccountNumberUnexpected(destinationIDStr)) {
             throw new InvalidArgumentException("dest account id is invalid");
         }
         int sourceId = Integer.parseInt(sourceIDStr);
         int destinationId = Integer.parseInt(destinationIDStr);
-        if (sourceId == destinationId) {
-            throw new InvalidArgumentException("equal source and dest account");
-        }
         if (receiptType.equals("move") && !(sourceId != -1 && destinationId != -1)) {
             throw new InvalidArgumentException("invalid account id");
         }
-        if (receiptType.equals("deposit") && sourceId != -1) {
-            throw new InvalidArgumentException("invalid account id");
+        if (receiptType.equals("deposit")) {
+            if (sourceId != -1)
+                throw new InvalidArgumentException("source account id is invalid");
+            if (destinationId == -1)
+                throw new InvalidArgumentException("invalid account id");
         }
-        if (receiptType.equals("withdraw") && destinationId != -1) {
-            throw new InvalidArgumentException("invalid account id");
+        if (receiptType.equals("withdraw")) {
+            if (sourceId == -1)
+                throw new InvalidArgumentException("invalid account id");
+            if (destinationId != -1)
+                throw new InvalidArgumentException("dest account id is invalid");
         }
-        if (!description.matches("\\w*")) {
-            throw new InvalidArgumentException("your input contains invalid characters");
+        if (sourceId == destinationId) {
+            throw new InvalidArgumentException("equal source and dest account");
         }
         Account account = Account.getAccountByAccountNumber(sourceId);
         if ((receiptType.equals("move") || receiptType.equals("withdraw"))) {
             if (account == null) {
                 throw new InvalidArgumentException("invalid account id");
             }
-            if (!account.getToken().equals(token)) {
+            if (!token.equals(account.getToken())) {
                 throw new IllegalAccountAccessException();
             }
         }
@@ -193,7 +199,7 @@ public class  Transaction {
     }
 
     public static String getTransactions(String token, String type) throws TokenExpiryException, TokenNotFoundException,
-            InvalidArgumentException {
+            InvalidArgumentException, IllegalAccountAccessException {
         Account account = Account.getAccountByToken(token);
         if (account == null)
             throw new TokenNotFoundException();
@@ -201,29 +207,34 @@ public class  Transaction {
             Transaction transaction = Transaction.getTransactionByIdentifier(type);
             if (transaction == null)
                 throw new InvalidArgumentException();
+            if (!account.equals(transaction.getSource()) && !account.equals(transaction.getDestination()))
+                throw new IllegalAccountAccessException();
             return transaction.toString();
         }
         boolean toTokenAccount = (type.equals("*") || type.equals("+"));
         boolean fromTokenAccount = (type.equals("*") || type.equals("-"));
+        if (!toTokenAccount && !fromTokenAccount)
+            throw new InvalidArgumentException("invalid input");
         ArrayList<String> transactions = new ArrayList<>();
         for (Transaction transaction : ALL_TRANSACTIONS) {
-            if (transaction.getSource().equals(account) && fromTokenAccount ||
-                    transaction.getDestination().equals(account) && toTokenAccount) {
+            if ((account.equals(transaction.getSource()) && fromTokenAccount) ||
+                    (account.equals(transaction.getDestination()) && toTokenAccount)) {
                 transactions.add(transaction.toString());
             }
         }
-        return String.join("*", transactions);
+        return String.join("*\n", transactions);
     }
 
     @Override
     public String toString() {
         return "{" +
-                "\"token\":\"" + token + '\"' +
-                ", \"receiptType\":\"" + receiptType + '\"' +
-                ", \"money\":" + money +
-                ", \"sourceID\":" + sourceID +
-                ", \"destinationID\":" + destinationID +
-                ", \"description\":\"" + description + '\"' +
+                "\"receiptType\":\"" + receiptType + "\",\n" +
+                "\"money\":" + money + ",\n" +
+                "\"sourceAccountID\":" + sourceID + ",\n" +
+                "\"destAccountID\":" + destinationID + ",\n" +
+                "\"description\":\"" + description + "\",\n" +
+                "\"id\":\"" + identifier +  "\",\n" +
+                "\"paid\":" + (isPayed() ? "1" : "0") +
                 '}';
     }
 

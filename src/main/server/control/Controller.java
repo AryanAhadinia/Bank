@@ -63,7 +63,7 @@ public class Controller {
             return Transaction.getTransactions(requestElements[1], requestElements[2]);
         } catch (TokenExpiryException e) {
             return "token expired";
-        } catch (TokenNotFoundException e) {
+        } catch (TokenNotFoundException | IllegalAccountAccessException e) {
             return "token is invalid";
         } catch (InvalidArgumentException e) {
             return "invalid receipt id";

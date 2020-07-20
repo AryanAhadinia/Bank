@@ -46,7 +46,7 @@ public class ClientThread extends Thread {
                     response.append(controller.controlCreateAccount(requestElements));
                 } else if ("get_token".equals(command) && requestElements.length == 3) {
                     response.append(controller.controlGetToken(requestElements));
-                } else if ("create_receipt".equals(command) && (requestElements.length == 6 || requestElements.length == 7)) {
+                } else if ("create_receipt".equals(command) /* && (requestElements.length == 6 || requestElements.length == 7)*/) {
                     response.append(controller.controlCreateReceipt(requestElements));
                 } else if ("get_transactions".equals(command) && requestElements.length == 3) {
                     response.append(controller.controlGetTransactions(requestElements));
