@@ -12,7 +12,7 @@ import transaction.exceptions.TransactionTypeException;
 
 import java.util.ArrayList;
 
-public class  Transaction {
+public class Transaction implements Comparable<Transaction> {
     private static final ArrayList<Transaction> ALL_TRANSACTIONS = new ArrayList<>();
 
     private final String token;
@@ -45,7 +45,7 @@ public class  Transaction {
     }
 
     public static String getInstance(String token, String receiptType, String moneyStr, String sourceIDStr,
-                                   String destinationIDStr, String description) throws TransactionTypeException,
+                                     String destinationIDStr, String description) throws TransactionTypeException,
             MoneyValueException, TokenNotFoundException, InvalidArgumentException, IllegalAccountAccessException,
             TokenExpiryException {
         if (!(receiptType.equals("deposit") || receiptType.equals("withdraw") || receiptType.equals("move"))) {
@@ -102,9 +102,17 @@ public class  Transaction {
         }
         Transaction transaction = new Transaction(token, receiptType, money, sourceId, destinationId, description,
                 false, "TR" + receiptType.substring(0, 3).toUpperCase() + String.format("%015d",
-                        ALL_TRANSACTIONS.size() + 1));
+                ALL_TRANSACTIONS.size() + 1));
         TransactionDataBase.add(transaction);
-         return transaction.getIdentifier();
+        return transaction.getIdentifier();
+    }
+
+    public static void sortAll() {
+        ALL_TRANSACTIONS.sort(Transaction::compareTo);
+    }
+
+    public static ArrayList<Transaction> getAllTransactions() {
+        return ALL_TRANSACTIONS;
     }
 
     public String getToken() {
@@ -225,18 +233,6 @@ public class  Transaction {
         return String.join("*\n", transactions);
     }
 
-    @Override
-    public String toString() {
-        return "{" +
-                "\"receiptType\":\"" + receiptType + "\",\n" +
-                "\"money\":" + money + ",\n" +
-                "\"sourceAccountID\":" + sourceID + ",\n" +
-                "\"destAccountID\":" + destinationID + ",\n" +
-                "\"description\":\"" + description + "\",\n" +
-                "\"id\":\"" + identifier +  "\",\n" +
-                "\"paid\":" + (isPayed() ? "1" : "0") +
-                '}';
-    }
 
     private static boolean isAccountNumberUnexpected(String accountNumberStr) {
         int accountNumber;
@@ -249,5 +245,25 @@ public class  Transaction {
             return false;
         else
             return Account.getAccountByAccountNumber(accountNumber) == null;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"receiptType\":\"" + receiptType + "\",\n" +
+                "\"money\":" + money + ",\n" +
+                "\"sourceAccountID\":" + sourceID + ",\n" +
+                "\"destAccountID\":" + destinationID + ",\n" +
+                "\"description\":\"" + description + "\",\n" +
+                "\"id\":\"" + identifier + "\",\n" +
+                "\"paid\":" + (isPayed() ? "1" : "0") +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Transaction transaction) {
+        int thisIdentifier = Integer.parseInt(this.getIdentifier().substring(5));
+        int otherIdentifier = Integer.parseInt(transaction.getIdentifier().substring(5));
+        return thisIdentifier - otherIdentifier;
     }
 }

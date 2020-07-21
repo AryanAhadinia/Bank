@@ -2,6 +2,7 @@ package main;
 
 import database.DataBase;
 import server.Server;
+import transaction.Transaction;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -18,6 +19,9 @@ public class Main {
     public static void main(String[] args) {
         DataBase.createNewTablesToStart();
         DataBase.importAllData();
+//        System.out.println(Transaction.getAllTransactions());
+//        Transaction.sortAll();
+//        System.out.println(Transaction.getAllTransactions());
         System.out.print("Do you want to print client actions? (Y for yes, any other phrase for no)\t");
         debugPrint = scanner.nextLine().equalsIgnoreCase("Y");
         try {
