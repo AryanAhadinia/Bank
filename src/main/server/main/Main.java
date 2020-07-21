@@ -2,9 +2,7 @@ package main;
 
 import database.DataBase;
 import server.Server;
-import transaction.Transaction;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -19,6 +17,7 @@ public class Main {
     public static void main(String[] args) {
         DataBase.createNewTablesToStart();
         DataBase.importAllData();
+//        TODO sort transactions
 //        System.out.println(Transaction.getAllTransactions());
 //        Transaction.sortAll();
 //        System.out.println(Transaction.getAllTransactions());
