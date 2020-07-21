@@ -10,9 +10,11 @@ import transaction.exceptions.InvalidArgumentException;
 import transaction.exceptions.MoneyValueException;
 import transaction.exceptions.TransactionTypeException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Transaction implements Comparable<Transaction> {
+public class Transaction implements Comparable<Transaction>, Serializable {
     private static final ArrayList<Transaction> ALL_TRANSACTIONS = new ArrayList<>();
 
     private final String token;
@@ -233,7 +235,6 @@ public class Transaction implements Comparable<Transaction> {
         return String.join("*\n", transactions);
     }
 
-
     private static boolean isAccountNumberUnexpected(String accountNumberStr) {
         int accountNumber;
         try {
@@ -258,6 +259,19 @@ public class Transaction implements Comparable<Transaction> {
                 "\"id\":\"" + identifier + "\",\n" +
                 "\"paid\":" + (isPayed() ? "1" : "0") +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return identifier.equals(that.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier);
     }
 
     @Override
